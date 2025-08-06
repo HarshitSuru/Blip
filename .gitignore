@@ -1,0 +1,74 @@
+# Node.js
+node_modules/
+dist/
+build/
+
+# Vite
+.vite/
+.vite-cache/
+
+# Env files
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+.eggs/
+*.egg
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtualenv
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyInstaller
+*.spec
+
+# mypy
+.mypy_cache/
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Test outputs
+*.pytest_cache/
+.tox/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# System files
+Thumbs.db
+Desktop.ini

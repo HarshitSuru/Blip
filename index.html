@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tavily AI News Brief</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        #topic-input {
+            flex-grow: 1;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
+        #topic-input:focus {
+            outline: 2px solid #3498db;
+        }
+
+        #search-button {
+            border: none;
+            background-color: #3498db;
+            color: white;
+            padding: 0 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #search-button:hover {
+            background-color: #2980b9;
+        }
+        
+        #status-message {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            display: none; /* Hidden by default */
+        }
+
+        .news-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .news-card h2 {
+            font-size: 1.25rem;
+            margin: 0 0 0.75rem 0;
+        }
+        
+        .news-card h2 a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .news-card h2 a:hover {
+            color: #3498db;
+        }
+
+        .news-card .summary {
+            flex-grow: 1;
+            color: #555;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>AI News Brief</h1>
+            <p>Your daily news, powered by Tavily and summarized by AI.</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="topic-input" placeholder="What are you interested in today?">
+            <button id="search-button">Search</button>
+        </div>
+
+        <div id="status-message"></div>
+        <div id="news-grid" class="news-grid"></div>
+    </div>
+
+    <script>
+        const topicInput = document.getElementById('topic-input');
+        const searchButton = document.getElementById('search-button');
+        const newsGrid = document.getElementById('news-grid');
+        const statusMessage = document.getElementById('status-message');
+
+        const fetchNews = async () => {
+            const topic = topicInput.value.trim();
+            if (!topic) {
+                alert('Please enter a topic to search.');
+                return;
+            }
+
+            // Show loading state and clear previous results
+            newsGrid.innerHTML = '';
+            statusMessage.style.display = 'block';
+            statusMessage.textContent = 'Searching and summarizing news for you...';
+
+            try {
+                // Call your Python backend API
+                const response = await fetch(`http://127.0.0.1:8000/search-news?topic=${encodeURIComponent(topic)}`);
+
+                if (!response.ok) {
+                    throw new Error(`The server responded with an error: ${response.status}`);
+                }
+
+                const articles = await response.json();
+                statusMessage.style.display = 'none';
+
+                if (articles.length === 0) {
+                    statusMessage.style.display = 'block';
+                    statusMessage.textContent = 'No relevant articles found. Please try a different topic.';
+                    return;
+                }
+
+                // Create and display a card for each article
+                articles.forEach(article => {
+                    const cardHTML = `
+                        <div class="news-card">
+                            <h2><a href="${article.url}" target="_blank" rel="noopener noreferrer">${article.title}</a></h2>
+                            <p class="summary">${article.summary}</p>
+                            <div class="card-footer">
+                                Source: <strong>${article.sourceName}</strong>
+                            </div>
+                        </div>
+                    `;
+                    newsGrid.innerHTML += cardHTML;
+                });
+
+            } catch (error) {
+                statusMessage.textContent = `Error: ${error.message}. Please ensure the backend server is running.`;
+                console.error("Fetch error:", error);
+            }
+        };
+
+        searchButton.addEventListener('click', fetchNews);
+        topicInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                fetchNews();
+            }
+        });
+    </script>
+</body>
+</html>
